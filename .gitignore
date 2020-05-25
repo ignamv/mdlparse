@@ -1,0 +1,3 @@
+*.o
+.*.swp
+.ipynb_checkpoints
