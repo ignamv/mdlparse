@@ -1,11 +1,15 @@
 #include <unity.h>
 #include <vector>
-#include "mdlparse.hpp"
-#include <cstring>
-
 #include <iostream>
+#include <cstring>
+#include "token.hpp"
+#include "tree.hpp"
+#include "table.hpp"
+
 
 using std::vector;
+
+void assert_tree_equals(Node *expected, Node *actual);
 
 void setUp() {}
 void tearDown() {}
@@ -69,8 +73,8 @@ void test_parseline() {
 }
 
 typedef struct {
-    vector<const char*>::const_iterator &it;
-    vector<const char*>::const_iterator &end;
+    vector<const char*>::const_iterator it;
+    vector<const char*>::const_iterator end;
 } t_userdata;
 
 int get_line_from_vector(char *buffer, void *userptr)
@@ -100,9 +104,7 @@ void test_parselines(void)
         "{",
         "}",
     };
-    auto it = lines.cbegin();
-    auto end = lines.cend();
-    t_userdata userdata = {it, end};
+    t_userdata userdata = {lines.cbegin(), lines.cend()};
     vector<Node*> *ret = parse_lines(get_line_from_vector, &userdata);
     vector<Node*> expected = { 
         new Node {
@@ -118,9 +120,48 @@ void test_parselines(void)
     assert_trees_equal(&expected, ret);
 }
 
+void test_parse_hyptable()
+{
+
+    vector<const char*> lines = {
+        "element \"key1\" \"value1\"",
+        "element \"key 2\" \"value2\"",
+        "element \"key3\" \"value 3\"",
+        "}",
+    };
+    t_userdata userdata = {lines.cbegin(), lines.cend()};
+    vector<KeyValue> *ret = parse_hyptable(get_line_from_vector, &userdata);
+    vector<KeyValue> expected = {
+        {"key1", "value1"},
+        {"key 2", "value2"},
+        {"key3", "value 3"},
+    };
+    TEST_ASSERT_TRUE(*ret == expected);
+}
+
+void test_parse_dataset()
+{
+
+    vector<const char*> lines = {
+        "datasize COMMON 3 1 1",
+        "type COMMON",
+        "point 0 1 1 1.89151e-12 0",
+        "point 1 1 1 2.96206e-12 0",
+    };
+    t_userdata userdata = {lines.cbegin(), lines.cend()};
+    /*vector<KeyValue> *ret = parse_dataset(get_line_from_vector, &userdata);
+    vector<Dataset> expected = {
+        {"key1", "value1"},
+        {"key 2", "value2"},
+        {"key3", "value 3"},
+    };
+    TEST_ASSERT_TRUE(*ret == expected);*/
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_parseline);
     RUN_TEST(test_parselines);
+    RUN_TEST(test_parse_hyptable);
     return UNITY_END();
 }
