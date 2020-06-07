@@ -1,7 +1,8 @@
 #include <string>
 #include <vector>
-#include <cassert>
+#include <cstring>
 #include "token.hpp"
+#include "util.hpp"
 
 using std::string;
 using std::vector;
@@ -11,36 +12,44 @@ Token *Token::from_cstr(const char *type, const char *name)
     return new Token { new string(type), new string(name) };
 }
 
-// Parse a line into a Token
-Token *parseline(const char *line) {
-    Token *ret = new Token {new string(""), new string("")};
-    const char *read = line;
-    while (!isspace(*read)) {
-        ret->type->push_back(*read++);
+void readword(std::istream& is, char *buffer, int length)
+{
+    char c;
+    while(length--)
+    {
+        is.get(c);
+        if (isspace(c))
+        {
+            *buffer++ = 0;
+            break;
+        }
+        *buffer++ = c;
     }
+}
+
+// Parse a line into a Token
+Token *parseline(std::istream &is)
+{
+    char type[50], name[50];
+    readword(is, type, sizeof(type));
     if (
-            ret->type->compare("caldata") == 0 || 
-            ret->type->compare("OPTIMEDIT") == 0|| 
-            ret->type->compare("circuitdeck") == 0 ||
-            ret->type->compare("data") == 0 ||
-            ret->type->compare("dataset") == 0)
+            !strcmp(type, "caldata") ||
+            !strcmp(type, "OPTIMEDIT") ||
+            !strcmp(type, "circuitdeck") ||
+            !strcmp(type, "data") ||
+            !strcmp(type, "dataset") )
     {
         // No name
-        return ret;
+        return new Token {new string(type), new string("")};
     }
-    if (ret->type->compare("LINK") == 0) {
-        // One more word for the type of LINK
-        read++;
-        ret->type->clear();
-        while (!isspace(*read)) {
-            ret->type->push_back(*read++);
-        }
+    if (!strcmp(type, "LINK"))
+    {
+        // Disregard 'LINK', read another word for the type of LINK
+        readword(is, type, sizeof(type));
     }
-    read++;
-    assert(*read++ == '"');
-    while (*read != '"') {
-        ret->name->push_back(*read++);
-    }
-    return ret;
+    is >> Consume("\"");
+    is.getline(name, sizeof(name), '"');
+    is >> Consume("\n");
+    return new Token{new string(type), new string(name)};
 }
 

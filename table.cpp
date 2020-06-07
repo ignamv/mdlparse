@@ -8,28 +8,32 @@
 
 using std::vector;
 
-vector<KeyValue> *parse_hyptable(t_get_line get_line, void *userptr)
+vector<KeyValue> *parse_hyptable(std::istream& is)
 {
     vector<KeyValue> *ret = new vector<KeyValue>();
     char line[LINE_LENGTH];
     char key[100], value[100];
+    char c;
+    Consume newline("\n");
     while (1) 
     {
-        assert(get_line(line, userptr));
-        if (line[0] == '}')
+        is >> c;
+        if (c == '}')
+        {
+            is >> newline;
             break;
-        assert(startsWith(line, "element \""));
-        char *keystart = &line[9];
-        char *keyend = strchr(keystart, '"');
-        int keylen = keyend - keystart;
-        strncpy(key, keystart, keylen);
-        key[keylen] = 0;
-        assert(startsWith(keyend, "\" \""));
-        char *valuestart = &keyend[4];
-        char *valueend = strchr(valuestart, '"');
-        int valuelen = valueend - valuestart;
-        strncpy(value, valuestart, valueend-valuestart);
-        value[valuelen] = 0;
+        }
+        if (c != 'e')
+        {
+            std::cerr << "Syntax error, unexpected '" << c << "' at byte " << is.tellg()
+                << std::endl;
+            throw SyntaxError("");
+        }
+        is >> Consume("lement \"");
+        is.getline(key, sizeof(key), '"');
+        is >> Consume(" \"");
+        is.getline(value, sizeof(value), '"');
+        is >> Consume("\n");
         ret->push_back(KeyValue { key, value });
     }
     return ret;
@@ -61,7 +65,7 @@ string& Table::at(int row, int col)
     return (*m_values)[col + row * m_headers->size()];
 }
 
-bool Table::operator==(const Table& rhs)
+bool Table::operator==(const Table& rhs) const
 {
     return *m_headers == *(rhs.m_headers) &&
         *m_values == *(rhs.m_values);
@@ -81,7 +85,7 @@ std::ostream& Table::operator<<(std::ostream& os) const
     os << std::endl;
 }
 
-unique_ptr<Table> Table::from_lines(std::function<int(char*)> get_line)
+unique_ptr<Table> Table::from_lines(std::istream& is)
 {
     return unique_ptr<Table>();
 }

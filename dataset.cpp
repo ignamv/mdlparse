@@ -47,42 +47,37 @@ int Dataset::size() const
     return m_size;
 }
 
-Dataset::Type parse_type(const char *line, const char **endptr)
+Dataset::Type parse_type(istream &is)
 {
-    if (startsWith(line, "MEAS")) {
-        if (endptr)
-            *endptr = &line[4];
-        return Dataset::Type::t_measured;
-    } else if (startsWith(line, "SIMU")) {
-        if (endptr)
-            *endptr = &line[4];
-        return Dataset::Type::t_simulated;
-    } else if (startsWith(line, "BOTH")) {
-        if (endptr)
-            *endptr = &line[4];
-        return Dataset::Type::t_both;
-    } else if (startsWith(line, "COMMON")) {
-        if (endptr)
-            *endptr = &line[6];
-        return Dataset::Type::t_common;
-    } else {
-        throw SyntaxError("Expected MEAS, SIMU, COMMON or BOTH");
-    }
+    char c;
+    is.get(c);
+    switch(c)
+    {
+        case 'M':
+            is >> Consume("EAS");
+            return Dataset::Type::t_measured;
+        case 'S':
+            is >> Consume("IMU");
+            return Dataset::Type::t_simulated;
+        case 'C':
+            is >> Consume("OMMON");
+            return Dataset::Type::t_common;
+        case 'B':
+            is >> Consume("OTH");
+            return Dataset::Type::t_both;
+        default:
+            throw SyntaxError("Expected MEAS, SIMU, COMMON or BOTH");
+    } 
 }
 
-Datasize parse_datasize(const char *line)
+Datasize parse_datasize(istream &is)
 {
-    const char *readptr;
-    assert(startsWith(line, "datasize "));
-    Dataset::Type type = parse_type(&line[9], &readptr);
-    assert(*readptr++ == ' ');
-    int size = strtol(readptr, (char**)&readptr, BASE_10);
+    int size, ports1, ports2;
+    is >> Consume("datasize ");
+    Dataset::Type type = parse_type(is);
+    is >> size >> ports1 >> ports2 >> Consume("\n");
     assert(size > 0);
-    assert(*readptr++ == ' ');
-    int ports1 = strtol(readptr, (char**)&readptr, BASE_10);
     assert(ports1 > 0);
-    assert(*readptr++ == ' ');
-    int ports2 = strtol(readptr, (char**)&readptr, BASE_10);
     assert(ports2 > 0);
     return {type, size, ports1, ports2};
 }
@@ -102,12 +97,11 @@ int get_current_array(Dataset::Type types, Dataset::Type current)
     throw SyntaxError("Invalid data type in dataset");
 }
 
-unique_ptr<Dataset> Dataset::from_lines(std::function<int(char*)> get_line)
+unique_ptr<Dataset> Dataset::from_lines(istream& is)
 {
     char line[LINE_LENGTH];
     char *readptr;
-    assert(get_line(line));
-    auto [types, size, ports1, ports2] = parse_datasize(line);
+    auto [types, size, ports1, ports2] = parse_datasize(is);
     int total_size = 2 * size * ports1 * ports2;
     vector<double> *data[2] = {
         new vector<double>(total_size),
@@ -123,29 +117,28 @@ unique_ptr<Dataset> Dataset::from_lines(std::function<int(char*)> get_line)
     Dataset::Type current_type;
     int current_array;
     bool type_set = false;
+    char c;
+    Consume newline("\n"), space(" ");
     while (true)
     {
-        assert(get_line(line));
-        if (startsWith(line, "type "))
+        is.get(c);
+        if (c == 't')
         {
-            current_type = parse_type(&line[5], NULL);
+            is >> Consume("ype ");
+            current_type = parse_type(is);
+            is >> newline;
             current_array = get_current_array(types, current_type);
             type_set = true;
-        } else if(startsWith(line, "point ")) {
-            int idx = strtol(&line[6], &readptr, BASE_10);
-            assert(*readptr == ' ');
-            int port1 = strtol(readptr, &readptr, BASE_10) - 1;
-            assert(*readptr == ' ');
-            int port2 = strtol(readptr, &readptr, BASE_10) - 1;
-            assert(*readptr == ' ');
-            double real = strtod(readptr, &readptr);
-            assert(*readptr == ' ');
-            double imag = strtod(readptr, &readptr);
-            int base_location = 2 * (idx + size * (port2 + ports2 * port1));
+        } else if(c == 'p') {
+            int idx, port1, port2;
+            double real, imag;
+            is >> Consume("oint ") >> idx >> port1 >> port2 >> real >> imag >> newline;
+            int base_location = 2 * (idx + size * (port2 - 1 + ports2 * (port1 - 1)));
             vector<double>& array = *data[current_array];
             array[base_location+0] = real;
             array[base_location+1] = imag;
-        } else if(line[0] == '}') {
+        } else if(c == '}') {
+            is >> newline;
             break;
         } else {
             throw SyntaxError("Invalid line in dataset");

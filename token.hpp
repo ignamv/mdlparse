@@ -3,6 +3,7 @@
 #define TOKEN_HPP
 
 #include <string>
+#include <istream>
 
 using std::string;
 
@@ -12,6 +13,6 @@ struct Token {
     static Token *from_cstr(const char*, const char*);
 };
 
-Token *parseline(const char *line);
+Token *parseline(std::istream &is);
 
 #endif

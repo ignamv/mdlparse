@@ -18,6 +18,7 @@ CPPFLAGS=-I$(UNITY)
 UNITY_CPP=$(UNITY)/unity.c 
 CXXFLAGS=-g -std=c++1z
 
+SRCS=util.cpp table.cpp tree.cpp token.cpp dataset.cpp test_mdlparse.cpp test_dataset.cpp test_table.cpp
 OBJS=util.o table.o tree.o token.o dataset.o 
 
 PROGRAMS=test_mdlparse.o test_dataset.o test_table.o
@@ -31,11 +32,14 @@ test_dataset: test_dataset.o $(UNITY_CPP) $(OBJS)
 test_table: test_table.o $(UNITY_CPP) $(OBJS)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
+test_stringstream: test_stringstream.o util.o
+	$(CXX) $(CXXFLAGS) -o $@ $^
+
 .PHONY: test clean
 test: test_mdlparse test_dataset test_table
-	#./test_mdlparse
+	./test_mdlparse
 	#./test_dataset
-	./test_table
+	#./test_table
 
 clean:
 	rm -rf $(OBJS) $(PROGRAMS)

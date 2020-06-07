@@ -2,6 +2,7 @@
 #include <vector>
 #include <iostream>
 #include <cstring>
+#include <sstream>
 #include "token.hpp"
 #include "tree.hpp"
 #include "table.hpp"
@@ -45,7 +46,8 @@ void assert_tree_equals(Node *expected, Node *actual)
 
 void test_case(Testcase *testcase) 
 {
-    Token *ret = parseline(testcase->input);
+    std::stringstream is(testcase->input);
+    Token *ret = parseline(is);
     Token *expected = Token::from_cstr(
             testcase->expected_type,
             testcase->expected_name);
@@ -93,19 +95,18 @@ int get_line_from_vector(char *buffer, void *userptr)
 
 void test_parselines(void)
 {
-    vector<const char*> lines = {
-        "LINK MODEL \"mymodel\"",
-        "{",
-        "LINK DUT \"mydut\"",
-        "{",
-        "}",
-        "}",
-        "LINK MODEL \"mymodel2\"",
-        "{",
-        "}",
-    };
-    t_userdata userdata = {lines.cbegin(), lines.cend()};
-    vector<Node*> *ret = parse_lines(get_line_from_vector, &userdata);
+    string input =
+        "LINK MODEL \"mymodel\"\n"
+        "{\n"
+        "LINK DUT \"mydut\"\n"
+        "{\n"
+        "}\n"
+        "}\n"
+        "LINK MODEL \"mymodel2\"\n"
+        "{\n"
+        "}\n";
+    std::stringstream is(input);
+    vector<Node*> *ret = parse_lines(is);
     vector<Node*> expected = { 
         new Node {
             Token::from_cstr("MODEL", "mymodel"),
@@ -123,14 +124,13 @@ void test_parselines(void)
 void test_parse_hyptable()
 {
 
-    vector<const char*> lines = {
-        "element \"key1\" \"value1\"",
-        "element \"key 2\" \"value2\"",
-        "element \"key3\" \"value 3\"",
-        "}",
-    };
-    t_userdata userdata = {lines.cbegin(), lines.cend()};
-    vector<KeyValue> *ret = parse_hyptable(get_line_from_vector, &userdata);
+    string input =
+        "element \"key1\" \"value1\"\n"
+        "element \"key 2\" \"value2\"\n"
+        "element \"key3\" \"value 3\"\n"
+        "}\n";
+    std::stringstream is(input);
+    vector<KeyValue> *ret = parse_hyptable(is);
     vector<KeyValue> expected = {
         {"key1", "value1"},
         {"key 2", "value2"},

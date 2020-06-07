@@ -20,3 +20,19 @@ int LineVectorReader::operator()(char *buffer) {
         return 1;
     }
 }
+
+std::istream& operator>>(std::istream& is, const Consume& consume)
+{
+    char actual;
+    for (const char expected : consume.m_str)
+    {
+        is.get(actual);
+        if (actual != expected)
+        {
+            std::cerr << "Expected " << consume.m_str << ", got " << actual << 
+                " (" << (int)actual << ") at byte " << is.tellg() << std::endl;
+            throw std::logic_error(consume.m_str);
+        }
+    }
+    return is;
+}

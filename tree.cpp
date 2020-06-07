@@ -7,29 +7,46 @@ using std::swap;
 
 #define LINE_LENGTH 200
 
-vector<Node*> *parse_lines(t_get_line get_line, void *userptr)
+vector<Node*> *parse_lines(std::istream &is)
 {
     vector<Node*> *ret = new vector<Node*>();
     vector<Node*> path;
-    char buffer1[LINE_LENGTH], buffer2[LINE_LENGTH];
-    char *line = buffer1, *previous_line = buffer2;
-    while (get_line(line, userptr)) {
-        if (line[0] == '{') {
-            Token *tok = parseline(previous_line);
+    int current_loc, previous_loc;
+    char c;
+    Consume newline("\n");
+    while (true)
+    {
+        current_loc = is.tellg();
+        is.get(c);
+        if (is.eof())
+            break;
+        if (c == '{') {
+            is >> newline;
+            is.seekg(previous_loc);
+            Token *tok = parseline(is);
+            is.seekg(current_loc+2);
             Node *node = new Node {tok, {}};
             if (!path.empty()) {
                 path.back()->children.push_back(node);
             }
             path.push_back(node);
-        } else if(line[0] == '}') {
+        } else if(c == '}') {
+            is >> newline;
+            if (path.empty())
+                throw SyntaxError("Unexpected }");
             Node *node = path.back();
             path.pop_back();
             if (path.empty()) {
                 // Found a root node
                 ret->push_back(node);
             }
+        } else {
+            char line[200];
+            is.getline(line, sizeof(line));
+            std::cout << "Ignoring " << c << line << std::endl;
+            //is.ignore('\n');
         }
-        swap(line, previous_line);
+        swap(current_loc, previous_loc);
     }
     return ret;
 }

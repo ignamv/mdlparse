@@ -22,7 +22,7 @@ inline bool operator==(const Datasize& lhs, const Datasize &rhs) {
         tie(rhs.size, rhs.ports1, rhs.ports2);
 }
 
-Dataset::Type parse_type(const char *line, const char **endptr);
-Datasize parse_datasize(const char *line);
+Datasize parse_datasize(istream &is);
+Dataset::Type parse_type(istream &is);
 
 #endif

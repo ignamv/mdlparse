@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <iostream>
 #include <vector>
+#include <string>
 
 using std::vector;
 using std::string;
@@ -40,6 +41,15 @@ class LineVectorReader
     private:
         const vector<string>& m_lines;
         vector<string>::const_iterator m_it;
+};
+
+class Consume
+{
+    public:
+        Consume(std::string str) : m_str(str) {}
+        friend std::istream& operator>>(std::istream& is, const Consume& consume);
+    private:
+        std::string m_str;
 };
 
 #endif

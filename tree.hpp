@@ -3,6 +3,7 @@
 #define TREE_HPP
 
 #include <vector>
+#include <istream>
 #include "token.hpp"
 #include "util.hpp"
 
@@ -15,6 +16,6 @@ struct Node {
 
 
 
-vector<Node*> *parse_lines(t_get_line, void*);
+vector<Node*> *parse_lines(std::istream&);
 
 #endif
