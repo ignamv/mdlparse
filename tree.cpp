@@ -63,3 +63,18 @@ vector<Node*> *parse_lines(std::istream &is)
     }
     return ret;
 }
+
+void Node::to_stream(ostream& os, int indent) const
+{
+    os << token << std::endl;
+    for (auto child : children)
+    {
+        child->to_stream(os, indent+1);
+    }
+}
+
+ostream& operator<<(ostream& os, const Node& node)
+{
+    node.to_stream(os, 0);
+    return os;
+}
