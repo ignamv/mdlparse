@@ -69,10 +69,11 @@ void test_parseline() {
         {"dataset\n", "dataset", ""},
         // With name
         {"HYPTABLE \"Edit Sweep Info\"\n", "HYPTABLE", "Edit Sweep Info"},
-        {"TABLE \"ICVIEWDATA\"\n", "TABLE", "ICVIEWDATA"},
+        {"TABLE \"ICVIEWDATA\" \"690.502\"\n", "TABLE", "ICVIEWDATA"},
         // LINK
         {"LINK DUT \"mydutname\"\n", "DUT", "mydutname"},
         {"LINK MODEL \"mymodelname\"\n", "MODEL", "mymodelname"},
+        {"LINK MODEL \"Data\" \"690.502\"", "MODEL", "Data"},
     };
     for (auto testcase : testcases) {
         test_case(&testcase);
