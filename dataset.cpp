@@ -12,31 +12,22 @@ using std::string;
 #define BASE_10 10
 
 Dataset::Dataset(Dataset::Type type,
-        unique_ptr<vector<double>> measured,
-        unique_ptr<vector<double>> simulated) :
+        unique_ptr<vector<double>> array1,
+        unique_ptr<vector<double>> array2) :
         m_type(type),
-        m_measured(std::move(measured)),
-        m_simulated(std::move(simulated))
+        m_array1(std::move(array1)),
+        m_array2(std::move(array2))
 {
-    switch (m_type)
-    {
-        case Dataset::Type::t_measured:
-        case Dataset::Type::t_both:
-        case Dataset::Type::t_common:
-            m_size = m_measured->size();
-            break;
-        case Dataset::Type::t_simulated:
-            m_size = m_simulated->size();
-    }
+    m_size = m_array1->size();
 }
 
 bool Dataset::operator==(const Dataset& rhs) const
 {
     if (m_type != rhs.m_type)
         return false;
-    if (*m_measured != *rhs.m_measured)
+    if (*m_array1 != *rhs.m_array1)
         return false;
-    if (m_type == Dataset::Type::t_both && *m_simulated != *rhs.m_simulated)
+    if (m_type == Dataset::Type::t_both && *m_array2 != *rhs.m_array2)
         return false;
     return true;
 }
@@ -187,11 +178,11 @@ ostream& operator<<(ostream& os, const Dataset& dataset)
 {
     
     os << "Dataset(" << type_to_string(dataset.m_type) << ", ";
-    doubles_to_stream(os, *dataset.m_measured);
+    doubles_to_stream(os, *dataset.m_array1);
     if (dataset.m_type == Dataset::Type::t_both)
     {
         os << ", ";
-        doubles_to_stream(os, *dataset.m_simulated);
+        doubles_to_stream(os, *dataset.m_array2);
     }
     os << ")";
     return os;

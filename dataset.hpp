@@ -28,7 +28,7 @@ class Dataset {
     private:
         Type m_type;
         int m_size;
-        unique_ptr<vector<double>> m_measured, m_simulated;
+        unique_ptr<vector<double>> m_array1, m_array2;
 };
 
 #endif
