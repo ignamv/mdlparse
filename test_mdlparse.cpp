@@ -140,6 +140,40 @@ void test_parselines(void)
     assert_trees_equal(&expected, ret);
 }
 
+void test_parselines_dataset(void)
+{
+    string input =
+R"(LINK OUT "myoutput"
+{
+dataset
+{
+datasize BOTH 2 1 1
+type MEAS
+point 0 1 1 1 2
+point 1 1 1 3 4
+type SIMU
+point 0 1 1 5 6
+point 1 1 1 7 8
+}
+}
+)";
+    std::stringstream is(input);
+    vector<Node*> *ret = parse_lines(is);
+    Node *child_node = new Node {Token::from_cstr("dataset", "")};
+    child_node->token->data.reset(new Dataset(Dataset::Type::t_both,
+                 std::unique_ptr<vector<double>>(
+                     new vector<double>{1, 2, 3, 4}), 
+                 std::unique_ptr<vector<double>>(
+                     new vector<double>{5, 6, 7, 8})));
+    vector<Node*> expected = { 
+        new Node {
+            Token::from_cstr("OUT", "myoutput"),
+            vector<Node*> {
+                child_node,
+            }},
+    };
+    assert_trees_equal(&expected, ret);
+}
 void test_parse_hyptable()
 {
 
@@ -181,6 +215,7 @@ int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_parseline);
     RUN_TEST(test_parselines);
+    RUN_TEST(test_parselines_dataset);
     RUN_TEST(test_parse_hyptable);
     return UNITY_END();
 }
