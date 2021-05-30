@@ -186,3 +186,14 @@ ostream& operator<<(ostream& os, const Dataset& dataset)
     os << ")";
     return os;
 }
+
+void Dataset::to_stream(ostream& os) const
+{
+    os << *this;
+}
+
+bool Dataset::equals(const TokenData& other_) const
+{
+    const Dataset& other = dynamic_cast<const Dataset&>(other_);
+    return *this == other;
+}
