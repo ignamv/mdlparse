@@ -6,6 +6,7 @@
 #include "token.hpp"
 #include "tree.hpp"
 #include "table.hpp"
+#include "dataset.hpp"
 
 
 using std::vector;
@@ -25,6 +26,10 @@ void assert_token_equals(Token *expected, Token *actual)
 {
     TEST_ASSERT_EQUAL_STRING(expected->type->c_str(), actual->type->c_str());
     TEST_ASSERT_EQUAL_STRING(expected->name->c_str(), actual->name->c_str());
+    if (expected->data != NULL)
+    {
+        ASSERT_EQUAL_PRINTABLE(*(expected->data), *(actual->data));
+    }
 }
 
 void assert_trees_equal(vector<Node*> *expected, vector<Node*> *actual)
