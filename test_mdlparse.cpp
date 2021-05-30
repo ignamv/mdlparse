@@ -192,23 +192,28 @@ void test_parse_hyptable()
     TEST_ASSERT_TRUE(*ret == expected);
 }
 
-void test_parse_dataset()
+void test_parselines_circuitdeck(void)
+{
+    string input =
+R"(data
+{
+circuitdeck
 {
 
-    vector<const char*> lines = {
-        "datasize COMMON 3 1 1",
-        "type COMMON",
-        "point 0 1 1 1.89151e-12 0",
-        "point 1 1 1 2.96206e-12 0",
+}
+}
+)";
+    std::stringstream is(input);
+    vector<Node*> *ret = parse_lines(is);
+    Node *child_node = new Node {Token::from_cstr("circuitdeck", "")};
+    vector<Node*> expected = { 
+        new Node {
+            Token::from_cstr("data", ""),
+            vector<Node*> {
+                child_node,
+            }},
     };
-    t_userdata userdata = {lines.cbegin(), lines.cend()};
-    /*vector<KeyValue> *ret = parse_dataset(get_line_from_vector, &userdata);
-    vector<Dataset> expected = {
-        {"key1", "value1"},
-        {"key 2", "value2"},
-        {"key3", "value 3"},
-    };
-    TEST_ASSERT_TRUE(*ret == expected);*/
+    assert_trees_equal(&expected, ret);
 }
 
 int main(void) {
@@ -216,6 +221,8 @@ int main(void) {
     RUN_TEST(test_parseline);
     RUN_TEST(test_parselines);
     RUN_TEST(test_parselines_dataset);
+    RUN_TEST(test_parselines_unclosed);
+    RUN_TEST(test_parselines_circuitdeck);
     RUN_TEST(test_parse_hyptable);
     return UNITY_END();
 }
