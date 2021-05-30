@@ -19,7 +19,20 @@ vector<Node*> *parse_lines(std::istream &is)
         current_loc = is.tellg();
         is.get(c);
         if (is.eof())
+        {
+            if (!path.empty())
+            {
+                std::cout << "Unclosed tokens:" << std::endl;
+                for (auto it : path)
+                {
+                    const Token& tok = *((*it).token);
+                    std::cout << *(tok.type) << " : " << *(tok.name) 
+                        << std::endl;
+                }
+                throw SyntaxError("Unclosed tokens");
+            }
             break;
+        }
         if (c == '{') {
             is >> newline;
             is.seekg(previous_loc);
