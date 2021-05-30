@@ -1,6 +1,8 @@
 #include <vector>
+#include <memory>
 #include "tree.hpp"
 #include "token.hpp"
+#include "dataset.hpp"
 
 using std::vector;
 using std::swap;
@@ -39,6 +41,16 @@ vector<Node*> *parse_lines(std::istream &is)
             Token *tok = parseline(is);
             is.seekg(current_loc+1);
             is >> consume_newline;
+            if (*(tok->type) == "dataset")
+            {
+                unique_ptr<Dataset> ds = Dataset::from_lines(is);
+                tok->data = std::move(ds);
+                is.seekg(-2, std::ios_base::cur);
+                if (is.peek() != '{')
+                {
+                    is.seekg(-1, std::ios_base::cur);
+                }
+            }
             Node *node = new Node {tok, {}};
             if (!path.empty()) {
                 path.back()->children.push_back(node);
