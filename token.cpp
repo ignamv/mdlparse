@@ -30,7 +30,7 @@ void readword(std::istream& is, char *buffer, int length)
 // Parse a line into a Token
 Token *parseline(std::istream &is)
 {
-    char type[50], name[50];
+    char type[150], name[150];
     readword(is, type, sizeof(type));
     if (
             !strcmp(type, "caldata") ||
