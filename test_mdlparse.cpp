@@ -118,7 +118,7 @@ void test_parselines(void)
         "LINK MODEL \"mymodel\"\n"
         "{\n"
         "LINK DUT \"mydut\"\n"
-        "{\n"
+        "{\r\n"
         "}\n"
         "}\n"
         "LINK MODEL \"mymodel2\"\n"
@@ -145,7 +145,7 @@ void test_parse_hyptable()
 
     string input =
         "element \"key1\" \"value1\"\n"
-        "element \"key 2\" \"value2\"\n"
+        "element \"key 2\" \"value2\"\r\n"
         "element \"key3\" \"value 3\"\n"
         "}\n";
     std::stringstream is(input);

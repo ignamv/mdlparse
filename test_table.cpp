@@ -42,7 +42,7 @@ void test_parse_table()
         {
             "element 0 \"Name\" \"k1\"\n"
             "element 0 \"Value\" \"v1\"\n"
-            "element 1 \"Name\" \"k2\"\n"
+            "element 1 \"Name\" \"k2\"\r\n"
             "element 1 \"Value\" \"v2\"\n"
          , Table(new vector<string>{"Name","Value"},
                  new vector<string>{"k1","v1","k2","v2"})};
