@@ -70,11 +70,11 @@ bool Table::operator==(const Table& rhs) const
         *m_values == *(rhs.m_values);
 }
 
-std::ostream& Table::operator<<(std::ostream& os) const
+std::ostream& operator<<(std::ostream& os, const Table& table)
 {
     os << "Table(" << std::endl;
     bool first = true;
-    for (string& header : *m_headers)
+    for (string& header : *(table.m_headers))
     {
         if (!first)
             os << "\t";

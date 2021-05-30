@@ -35,7 +35,7 @@ class Table
         string& at(int, int);
         const string& cat(int, int) const;
         bool operator==(const Table& rhs) const;
-        std::ostream& operator<<(std::ostream&) const;
+        friend std::ostream& operator<<(std::ostream&, const Table&);
         static unique_ptr<Table> from_lines(std::istream&);
     private:
         unique_ptr<vector<string>> m_values;
