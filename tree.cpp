@@ -37,7 +37,8 @@ vector<Node*> *parse_lines(std::istream &is)
             is >> consume_newline;
             is.seekg(previous_loc);
             Token *tok = parseline(is);
-            is.seekg(current_loc+2);
+            is.seekg(current_loc+1);
+            is >> consume_newline;
             Node *node = new Node {tok, {}};
             if (!path.empty()) {
                 path.back()->children.push_back(node);
