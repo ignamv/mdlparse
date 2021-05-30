@@ -52,4 +52,6 @@ class Consume
         std::string m_str;
 };
 
+std::istream& consume_newline(std::istream&);
+
 #endif

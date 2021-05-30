@@ -21,6 +21,32 @@ int LineVectorReader::operator()(char *buffer) {
     }
 }
 
+std::istream& consume_newline(std::istream& is)
+{
+    char c;
+    is.get(c);
+    if (is.eof())
+    {
+        std::cerr << "At byte " << is.tellg() << std::endl;
+        throw SyntaxError("Unexpected EOF");
+    }
+    if (c == '\n')
+    {
+        return is;
+    } else if(c == '\r') {
+        is.get(c);
+        if (is.eof())
+        {
+            throw SyntaxError("Unexpected EOF");
+        }
+        if (c == '\n') {
+            return is;
+        }
+    }
+    std::cerr << "At byte " << is.tellg() << std::endl;
+    throw SyntaxError("Expected newline");
+}
+
 std::istream& operator>>(std::istream& is, const Consume& consume)
 {
     char actual;

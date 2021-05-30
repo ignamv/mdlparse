@@ -75,8 +75,8 @@ Datasize parse_datasize(istream &is)
     int size, ports1, ports2;
     is >> Consume("datasize ");
     Dataset::Type type = parse_type(is);
-    is >> size >> ports1 >> ports2 >> Consume("\n");
-    assert(size > 0);
+    is >> size >> ports1 >> ports2 >> consume_newline;
+    //assert(size > 0);
     assert(ports1 > 0);
     assert(ports2 > 0);
     return {type, size, ports1, ports2};
@@ -118,7 +118,7 @@ unique_ptr<Dataset> Dataset::from_lines(istream& is)
     int current_array;
     bool type_set = false;
     char c;
-    Consume newline("\n"), space(" ");
+    Consume space(" ");
     while (true)
     {
         is.get(c);
@@ -126,19 +126,19 @@ unique_ptr<Dataset> Dataset::from_lines(istream& is)
         {
             is >> Consume("ype ");
             current_type = parse_type(is);
-            is >> newline;
+            is >> consume_newline;
             current_array = get_current_array(types, current_type);
             type_set = true;
         } else if(c == 'p') {
             int idx, port1, port2;
             double real, imag;
-            is >> Consume("oint ") >> idx >> port1 >> port2 >> real >> imag >> newline;
+            is >> Consume("oint ") >> idx >> port1 >> port2 >> real >> imag >> consume_newline;
             int base_location = 2 * (idx + size * (port2 - 1 + ports2 * (port1 - 1)));
             vector<double>& array = *data[current_array];
             array[base_location+0] = real;
             array[base_location+1] = imag;
         } else if(c == '}') {
-            is >> newline;
+            is >> consume_newline;
             break;
         } else {
             throw SyntaxError("Invalid line in dataset");

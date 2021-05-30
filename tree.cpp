@@ -34,7 +34,7 @@ vector<Node*> *parse_lines(std::istream &is)
             break;
         }
         if (c == '{') {
-            is >> newline;
+            is >> consume_newline;
             is.seekg(previous_loc);
             Token *tok = parseline(is);
             is.seekg(current_loc+2);

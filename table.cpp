@@ -14,13 +14,12 @@ vector<KeyValue> *parse_hyptable(std::istream& is)
     char line[LINE_LENGTH];
     char key[100], value[100];
     char c;
-    Consume newline("\n");
     while (1) 
     {
         is >> c;
         if (c == '}')
         {
-            is >> newline;
+            is >> consume_newline;
             break;
         }
         if (c != 'e')
@@ -33,7 +32,7 @@ vector<KeyValue> *parse_hyptable(std::istream& is)
         is.getline(key, sizeof(key), '"');
         is >> Consume(" \"");
         is.getline(value, sizeof(value), '"');
-        is >> Consume("\n");
+        is >> consume_newline;
         ret->push_back(KeyValue { key, value });
     }
     return ret;
