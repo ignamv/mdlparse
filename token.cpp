@@ -53,3 +53,21 @@ Token *parseline(std::istream &is)
     return new Token{new string(type), new string(name)};
 }
 
+std::ostream& operator<<(std::ostream& os, const Token& token)
+{
+    os << *(token.type) << " : " << *(token.name); 
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const TokenData& tokendata)
+{
+    tokendata.to_stream(os);
+    return os;
+}
+
+bool operator==(const TokenData& l, const TokenData& r)
+{
+    if (typeid(l) != typeid(r))
+        return false;
+    return l.equals(r);
+}
