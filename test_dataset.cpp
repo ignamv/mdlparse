@@ -64,7 +64,7 @@ void test_parse_dataset()
     TestCase mytestcase1 =
         {
             "datasize MEAS 2 1 1\n"
-            "type MEAS\n"
+            "type MEAS\r\n"
             "point 0 1 1 1.0E-01 2.0E-2\n"
             "point 1 1 1 3.0E-03 4.0E-4\n"
             "}\n",
