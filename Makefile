@@ -38,8 +38,8 @@ test_stringstream: test_stringstream.o util.o
 .PHONY: test clean
 test: test_mdlparse test_dataset test_table
 	./test_mdlparse
-	#./test_dataset
-	#./test_table
+	./test_dataset
+	./test_table
 
 clean:
 	rm -rf $(OBJS) $(PROGRAMS)
