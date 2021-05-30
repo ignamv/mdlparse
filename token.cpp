@@ -49,7 +49,7 @@ Token *parseline(std::istream &is)
     }
     is >> Consume("\"");
     is.getline(name, sizeof(name), '"');
-    is >> Consume("\n");
+    is.ignore('\n');
     return new Token{new string(type), new string(name)};
 }
 
