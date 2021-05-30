@@ -72,10 +72,8 @@ vector<Node*> *parse_lines(std::istream &is)
                     throw;
             }
         } else {
-            char line[200];
-            is.getline(line, sizeof(line));
-            std::cout << "Ignoring " << c << line << std::endl;
-            //is.ignore('\n');
+            if (c != '\n')
+                is.ignore(999, '\n');
         }
         swap(current_loc, previous_loc);
     }
