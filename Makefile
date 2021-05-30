@@ -32,6 +32,9 @@ test_dataset: test_dataset.o $(UNITY_CPP) $(OBJS)
 test_table: test_table.o $(UNITY_CPP) $(OBJS)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
+parse_file: parse_file.o $(OBJS)
+	$(CXX) $(CXXFLAGS) -o $@ $^
+
 test_stringstream: test_stringstream.o util.o
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
