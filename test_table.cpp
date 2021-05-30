@@ -44,6 +44,7 @@ void test_parse_table()
             "element 0 \"Value\" \"v1\"\n"
             "element 1 \"Name\" \"k2\"\r\n"
             "element 1 \"Value\" \"v2\"\n"
+            "}\n"
          , Table(new vector<string>{"Name","Value"},
                  new vector<string>{"k1","v1","k2","v2"})};
     vector<TestCase*> testcases = {&mytestcase1};
@@ -51,13 +52,14 @@ void test_parse_table()
     {
         std::stringstream is(testcase->lines);
         auto actual = Table::from_lines(is);
-        //ASSERT_EQUAL_PRINTABLE(testcase->expected, *actual);
+        ASSERT_EQUAL_PRINTABLE(testcase->expected, *actual);
     }
 }
 
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_table_class);
+    RUN_TEST(test_parse_table);
     return UNITY_END();
 }
 
