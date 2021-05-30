@@ -86,5 +86,53 @@ std::ostream& operator<<(std::ostream& os, const Table& table)
 
 unique_ptr<Table> Table::from_lines(std::istream& is)
 {
-    return unique_ptr<Table>();
+    char c;
+    char header[100], value[100];
+    int last_idx=-1;
+    vector<string> *headers = new vector<string>();
+    vector<string> *values = new vector<string>();
+    vector<string>::const_iterator current_header;
+    while (true)
+    {
+        is.get(c);
+        if (c == '}')
+        {
+            is >> consume_newline;
+            break;
+        } else if(c == 'V') {
+            is >> Consume("iew");
+            is.ignore(999, '\n');
+            continue;
+        } 
+        if (c != 'e')
+        {
+            is.clear();
+            std::cout << "Unexpected '" << c << "' at byte " << is.tellg() << std::endl;
+            throw SyntaxError("");
+        }
+        int idx;
+        is >> Consume("lement ") >> idx >> Consume(" \"");
+        is.getline(header, sizeof(header), '"');
+        is >> Consume(" \"");
+        is.getline(value, sizeof(value), '"');
+        is >> consume_newline;
+        values->push_back(value);
+        if (idx == 0)
+        {
+            headers->push_back(header);
+        } else {
+            if(last_idx != idx) 
+            {
+                current_header = headers->cbegin();
+            }
+            if(*current_header != header)
+            {
+                std::cerr << "Expected header " << *current_header << " at byte " << is.tellg() << std::endl;
+                throw SyntaxError("");
+            }
+            current_header++;
+        }
+        last_idx = idx;
+    }
+    return unique_ptr<Table>(new Table(headers, values));
 }
