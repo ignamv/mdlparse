@@ -75,7 +75,7 @@ vector<Node*> *parse_lines(std::istream &is)
             if (c != '\n')
                 is.ignore(999, '\n');
         }
-        swap(current_loc, previous_loc);
+        previous_loc = current_loc;
     }
     return ret;
 }
