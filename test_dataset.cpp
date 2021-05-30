@@ -88,7 +88,18 @@ void test_parse_dataset()
                  std::unique_ptr<vector<double>>(
                      new vector<double>{4e-1,3e-2,2e-3,1e-4})
                  )};
-    vector<TestCase*> testcases = {&mytestcase1, &mytestcase2};
+    TestCase mytestcase3 =
+        {
+            "datasize SIMU 2 1 1\n"
+            "type SIMU\r\n"
+            "point 0 1 1 1.0E-01 2.0E-2\r\n"
+            "point 1 1 1 3.0E-03 4.0E-4\n"
+            "}\n",
+         Dataset(Dataset::Type::t_simulated,
+                 std::unique_ptr<vector<double>>(
+                     new vector<double>{1e-1,2e-2,3e-3,4e-4}), 
+                 std::unique_ptr<vector<double>>())};
+    vector<TestCase*> testcases = {&mytestcase1, &mytestcase2, &mytestcase3};
     for (TestCase *testcase : testcases)
     {
         std::stringstream ss(testcase->lines);
