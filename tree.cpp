@@ -57,7 +57,6 @@ vector<Node*> *parse_lines(std::istream &is)
             }
             path.push_back(node);
         } else if(c == '}') {
-            is >> newline;
             if (path.empty())
                 throw SyntaxError("Unexpected }");
             Node *node = path.back();
@@ -65,6 +64,12 @@ vector<Node*> *parse_lines(std::istream &is)
             if (path.empty()) {
                 // Found a root node
                 ret->push_back(node);
+            }
+            try {
+                is >> consume_newline;
+            } catch(const SyntaxError& e) {
+                if (!is.eof())
+                    throw;
             }
         } else {
             char line[200];
