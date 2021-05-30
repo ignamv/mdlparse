@@ -73,6 +73,10 @@ Datasize parse_datasize(istream &is)
     return {type, size, ports1, ports2};
 }
 
+// Get index of the current array (MEAS, SIMU or COMMON)
+// For a given dataset type (MEAS, SIMU, COMMON or BOTH)
+// Returns 0 unless dataset is BOTH and we're asking for SIMU
+// Also checks for consistency (don't ask for SIMU from a MEAS dataset)
 int get_current_array(Dataset::Type types, Dataset::Type current)
 {
     assert(current != Dataset::Type::t_both);
@@ -100,11 +104,6 @@ unique_ptr<Dataset> Dataset::from_lines(istream& is)
                 new vector<double>(total_size) : 
                 NULL,
     };
-    //data[0] = unique_ptr<vector<double>>(new vector<double>(total_size));
-    //if (types == Dataset::Type::t_both)
-    //{
-        //data[1] = new vector<double>(total_size);
-    //}
     Dataset::Type current_type;
     int current_array;
     bool type_set = false;
