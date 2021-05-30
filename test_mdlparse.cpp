@@ -99,6 +99,19 @@ int get_line_from_vector(char *buffer, void *userptr)
     }
 }
 
+void test_parselines_unclosed(void)
+{
+    string input = "LINK MODEL \"mymodel\"\n{\n";
+    std::stringstream is(input);
+    try
+    {
+        vector<Node*> *ret = parse_lines(is);
+    } catch(const SyntaxError&) {
+        return;
+    }
+    TEST_FAIL_MESSAGE("Should have raised SyntaxError due to unclosed {");
+}
+
 void test_parselines(void)
 {
     string input =
